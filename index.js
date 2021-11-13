@@ -39,6 +39,13 @@ async function server() {
       res.json(watches);
     });
 
+    //ADD NEW REVIEW TO DB
+    app.post("/reviews", async (req, res) => {
+      const review = req.body;
+      const result = await reviewCollection.insertOne(review);
+      res.json(result);
+    });
+
     // GET ALL REVIEWS FROM DB
     app.get("/reviews", async (req, res) => {
       const reviews = await reviewCollection.find({}).toArray();
@@ -80,15 +87,13 @@ async function server() {
       const watch = req.body;
       const result = await watchCollection.insertOne(watch);
       res.json(result);
-
-      console.log(result);
     });
 
     // SAVE USER INFO TO DB
     app.post("/users", async (req, res) => {
       const user = req.body;
       const result = await userCollection.insertOne(user);
-      console.log(result);
+
       res.json(result);
     });
 
@@ -101,17 +106,36 @@ async function server() {
       res.json(result);
     });
 
+    //CREATE A NEW ADMIN
+    app.put("/users/admin", async (req, res) => {
+      const email = req.body.email;
+      const filter = { email: email };
+      const updateDoc = { $set: { role: "admin" } };
+      const result = await userCollection.updateOne(filter, updateDoc);
+      res.json(result);
+
+      console.log(result);
+    });
+
     // GET A USER WITH ADMIN ROLE
     app.get("/users/:email", async (req, res) => {
       const email = req.params.email;
       const query = { email: email };
       const user = await userCollection.findOne(query);
-      console.log(user);
+
       let isAdmin = false;
       if (user?.role === "admin") {
         isAdmin = true;
       }
       res.json({ admin: isAdmin });
+    });
+
+    //GET ALL ADMINS
+    app.get("/admins", async (req, res) => {
+      const query = { role: "admin" };
+      const admins = await userCollection.find(query).toArray();
+      res.send(admins);
+      console.log(admins);
     });
 
     //UPDATE A ORDER STATUS
