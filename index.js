@@ -113,8 +113,6 @@ async function server() {
       const updateDoc = { $set: { role: "admin" } };
       const result = await userCollection.updateOne(filter, updateDoc);
       res.json(result);
-
-      console.log(result);
     });
 
     // GET A USER WITH ADMIN ROLE
@@ -135,7 +133,6 @@ async function server() {
       const query = { role: "admin" };
       const admins = await userCollection.find(query).toArray();
       res.send(admins);
-      console.log(admins);
     });
 
     //UPDATE A ORDER STATUS
